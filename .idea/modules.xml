@@ -3,8 +3,6 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/keynavcheck.iml" filepath="$PROJECT_DIR$/.idea/modules/keynavcheck.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/keynavcheck_main.iml" filepath="$PROJECT_DIR$/.idea/modules/keynavcheck_main.iml" group="keynavcheck" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/keynavcheck_test.iml" filepath="$PROJECT_DIR$/.idea/modules/keynavcheck_test.iml" group="keynavcheck" />
     </modules>
   </component>
 </project>
