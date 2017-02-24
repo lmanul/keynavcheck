@@ -1,2 +1,5 @@
 **/.idea/tasks.xml
 **/.idea/workspace.xml
+**/.gradle
+build/libs/keynavcheck.jar
+build/tmp
