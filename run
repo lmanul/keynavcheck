@@ -1,0 +1,31 @@
+#!/usr/bin/python
+
+import os
+import sys
+
+from optparse import OptionParser
+
+parser = OptionParser()
+parser.add_option("-f", "--force_recompile", dest="force_recompile",
+                  action="store_true",
+                  help="Force recompilation of dependencies")
+(options, args) = parser.parse_args()
+
+if len(args) > 0:
+  argument = args[0]
+else:
+  argument = ""
+
+if not os.access("prebuilt/cyborg.jar", os.R_OK) or options.force_recompile:
+  print("Recompiling cyborg.jar...")
+  os.chdir("../cyborg")
+  os.system("./gradlew assemble && cp build/libs/cyborg.jar ../keynavcheck/prebuilt/cyborg.jar")
+  os.chdir("../keynavcheck")
+else:
+  print("Using prebuilt cyborg.jar")
+if argument is not "":
+  print("Script called with " + argument)
+
+command = "./gradlew assemble && java -jar build/libs/KeyNavCheck.jar " + argument
+print(command)
+os.system(command)
