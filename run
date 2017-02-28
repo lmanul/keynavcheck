@@ -28,7 +28,7 @@ if argument is not "":
   print("Script called with " + argument)
 
 if exitCode is 0:
-  command = "./gradlew assemble && java -jar build/libs/KeyNavCheck.jar " + argument
+  command = "./gradlew assemble && java -jar build/libs/keynavcheck.jar " + argument
   print(command)
   os.system(command)
 else:

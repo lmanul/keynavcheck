@@ -27,12 +27,15 @@ import java.util.Set;
 
 public class KeyNavCheck extends CyborgTest {
 
-    private static Set<String> WHITELISTED_INACCESSIBLE_IDS = new HashSet<>();
+    private static final Set<String> WHITELISTED_INACCESSIBLE_IDS = new HashSet<>();
     static {
       WHITELISTED_INACCESSIBLE_IDS.add("id/back");
       WHITELISTED_INACCESSIBLE_IDS.add("id/home");
       WHITELISTED_INACCESSIBLE_IDS.add("id/recent_apps");
     }
+
+  private static final int MAX_NUMBER_OF_CYCLABLE_ELEMENTS_AT_TOP_LEVEL = 15;
+  private static final int MAX_EXPLORATION_CYCLE_LENGTH = 40;
 
     @Override
     public void setUp() {
@@ -72,7 +75,36 @@ public class KeyNavCheck extends CyborgTest {
       pressKeyWithCode(61, 50);
     }
 
-    public void testKeyboardNavigation() {
+    public void testCycleLengthAtTopLevel() {
+      ViewNode initiallyFocusedNode = getFocusedNode();
+      Set<String> visitedNodeIds = new HashSet<>();
+      while (initiallyFocusedNode == null) {
+        System.err.println("Tabbing until we get a focused element...");
+        cycle();
+        initiallyFocusedNode = getFocusedNode();
+      }
+      String initiallyFocusedElementId = Util.getUniqueId(initiallyFocusedNode);
+      visitedNodeIds.add(initiallyFocusedElementId);
+
+      int numberOfNodesInTopLevelCycle = 1;
+      while (numberOfNodesInTopLevelCycle < MAX_EXPLORATION_CYCLE_LENGTH) {
+        cycle();
+        ViewNode focusedNode = getFocusedNode();
+        String focusedNodeId = Util.getUniqueId(focusedNode);
+        if (visitedNodeIds.contains(focusedNodeId)) {
+          // We're back at a visited node.
+          break;
+        }
+        numberOfNodesInTopLevelCycle++;
+      }
+      System.err.println("Top level cycle has " + numberOfNodesInTopLevelCycle + " elements.");
+      assertTrue("There should be fewer than " + MAX_NUMBER_OF_CYCLABLE_ELEMENTS_AT_TOP_LEVEL
+          + " elements to tab through at the top level of the activity, but found "
+          + numberOfNodesInTopLevelCycle,
+          numberOfNodesInTopLevelCycle <= MAX_NUMBER_OF_CYCLABLE_ELEMENTS_AT_TOP_LEVEL);
+    }
+
+    public void disabledTestKeyboardNavigation() {
       boolean testPassed = true;
 
       Set<String> visitedNodeIds = new HashSet<>();
