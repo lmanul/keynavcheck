@@ -48,6 +48,7 @@ public class KeyNavCheck extends CyborgTest {
 
   @Override
   public void setUp() {
+    System.err.println("\n\n######################################################################\n");
   }
 
   @Override
@@ -113,7 +114,7 @@ public class KeyNavCheck extends CyborgTest {
         numberOfNodesInTopLevelCycle <= MAX_NUMBER_OF_CYCLABLE_ELEMENTS_AT_TOP_LEVEL);
   }
 
-  public void disabledTestKeyboardNavigation() {
+  public void testAllClickableElementsCanBeAccessed() {
     boolean testPassed = true;
 
     Set<String> visitedNodeIds = new HashSet<>();
