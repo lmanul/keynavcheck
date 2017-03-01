@@ -24,12 +24,9 @@ if not os.access("prebuilt/cyborg.jar", os.R_OK) or options.force_recompile:
   os.chdir("../keynavcheck")
 else:
   print("Using prebuilt cyborg.jar")
-if argument is not "":
-  print("Script called with " + argument)
 
 if exitCode is 0:
   command = "./gradlew assemble && java -jar build/libs/keynavcheck.jar " + argument
-  print(command)
   os.system(command)
 else:
   print "Previous command failed, aborting."
