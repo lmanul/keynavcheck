@@ -18,9 +18,11 @@ package com.android.keynavcheck;
 
 import com.android.cyborg.Cyborg;
 import com.android.cyborg.CyborgTest;
+import com.android.cyborg.CyborgTestOptions;
 import com.android.cyborg.Filter;
 import com.android.cyborg.ViewNode;
 
+import java.security.Key;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -28,14 +30,21 @@ import java.util.Set;
 public class KeyNavCheck extends CyborgTest {
 
   private static final Set<String> WHITELISTED_INACCESSIBLE_IDS = new HashSet<>();
+  private static final CyborgTestOptions OPTIONS = new CyborgTestOptions();
   static {
     WHITELISTED_INACCESSIBLE_IDS.add("id/back");
     WHITELISTED_INACCESSIBLE_IDS.add("id/home");
     WHITELISTED_INACCESSIBLE_IDS.add("id/recent_apps");
+
+    OPTIONS.printStackTrace = false;
   }
 
   private static final int MAX_NUMBER_OF_CYCLABLE_ELEMENTS_AT_TOP_LEVEL = 15;
   private static final int MAX_EXPLORATION_CYCLE_LENGTH = 40;
+
+  public KeyNavCheck() {
+    super(OPTIONS);
+  }
 
   @Override
   public void setUp() {
@@ -97,7 +106,7 @@ public class KeyNavCheck extends CyborgTest {
       }
       numberOfNodesInTopLevelCycle++;
     }
-    System.err.println("Top level cycle has " + numberOfNodesInTopLevelCycle + " elements.");
+    System.err.println("" + numberOfNodesInTopLevelCycle + " elements in the top level cycle.");
     assertTrue("There should be fewer than " + MAX_NUMBER_OF_CYCLABLE_ELEMENTS_AT_TOP_LEVEL
             + " elements to tab through at the top level of the activity, but found "
             + numberOfNodesInTopLevelCycle,
