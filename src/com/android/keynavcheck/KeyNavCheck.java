@@ -53,22 +53,19 @@ public class KeyNavCheck extends CyborgTest {
 
   @Override
   public void runTests(CyborgTest testObject) {
-    tearDown();
-    cyborg.pressHome();
+    killActivityUnderTest();
     super.runTests(testObject);
   }
 
   @Override
   public void setUp() {
     System.err.println("\n\n###################################################################\n");
-    cyborg.runShellCommand("am start -n " + this.pkg + "/" + this.activity);
-    cyborg.onAfterUserInteraction(5000);
+    launchActivityUnderTest();
   }
 
   @Override
   public void tearDown() {
-    cyborg.runShellCommand("am force-stop " + this.pkg);
-    cyborg.onAfterUserInteraction(2000);
+    killActivityUnderTest();
   }
 
   private ViewNode getFocusedNode() {
@@ -79,6 +76,23 @@ public class KeyNavCheck extends CyborgTest {
       return null;
     }
     return focusedNodes.get(0);
+  }
+
+  private void launchActivityUnderTest() {
+    if (!pkg.isEmpty() && !activity.isEmpty()) {
+      cyborg.runShellCommand("am start -n " + this.pkg + "/" + this.activity);
+      cyborg.onAfterUserInteraction(5000);
+    }
+  }
+
+  private void killActivityUnderTest() {
+    if (!pkg.isEmpty() && !activity.isEmpty()) {
+      // This seems to cause problems for discovering UI elements later on. Need to find a less
+      // aggressive way of closing the application.
+      // cyborg.runShellCommand("am force-stop " + this.pkg);
+      cyborg.pressHome();
+      cyborg.onAfterUserInteraction(2000);
+    }
   }
 
   private void printIdentifiableNodeInfo(ViewNode node) {
@@ -106,6 +120,7 @@ public class KeyNavCheck extends CyborgTest {
     Set<String> visitedNodeIds = new HashSet<>();
     while (initiallyFocusedNode == null) {
       System.err.println("Tabbing until we get a focused element...");
+      List<ViewNode> allNodes = cyborg.getNodesForObjectsWithFilter(Filter.empty());
       cycle();
       initiallyFocusedNode = getFocusedNode();
     }
@@ -123,7 +138,6 @@ public class KeyNavCheck extends CyborgTest {
       }
       numberOfNodesInTopLevelCycle++;
     }
-    System.err.println("" + numberOfNodesInTopLevelCycle + " elements in the top level cycle.");
     assertTrue("There should be fewer than " + MAX_NUMBER_OF_CYCLABLE_ELEMENTS_AT_TOP_LEVEL
             + " elements to tab through at the top level of the activity, but found "
             + numberOfNodesInTopLevelCycle,
@@ -196,11 +210,15 @@ public class KeyNavCheck extends CyborgTest {
   }
 
   public static void main(String[] args) {
-    if (args.length <= 0 || !args[0].contains("/")) {
-      System.err.println("Usage: keynavcheck package/activity");
-      System.exit(-1);
+    String pkg = "", activity = "";
+    if (args.length > 0 && args[0].contains("/")) {
+      String[] parts = args[0].split("/");
+      pkg = parts[0];
+      activity = parts[1];
+    } else {
+      System.err.println("No activity specified in argument (e.g. 'package/activity'), "
+          + "using activity currently on top of the stack.");
     }
-    String[] parts = args[0].split("/");
-    new KeyNavCheck(parts[0], parts[1]).init();
+    new KeyNavCheck(pkg, activity).init();
   }
 }
