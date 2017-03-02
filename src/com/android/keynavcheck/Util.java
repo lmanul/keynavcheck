@@ -19,10 +19,14 @@ package com.android.keynavcheck;
 import com.android.cyborg.Cyborg;
 import com.android.cyborg.Rect;
 import com.android.cyborg.ViewNode;
+import com.android.ddmlib.RawImage;
 
 public class Util {
 
   public static String getUniqueId(ViewNode node) {
+    if (node == null) {
+      return "[null node]";
+    }
     Rect rect = Cyborg.getRectForNode(node);
     String id = node.id;
     String text = "";
@@ -34,5 +38,17 @@ public class Util {
       contentDesc = node.namedProperties.get("accessibility:contentDescription").value;
     }
     return id + ":" + rect.toString() + ":" + text + ":" + contentDesc;
+  }
+
+  public static boolean rawImagesAreEqual(RawImage a, RawImage b) {
+    if (a.data.length != b.data.length) {
+      return false;
+    }
+    for (int i = 0; i < a.data.length; i++) {
+      if (a.getARGB(i) != b.getARGB(i)) {
+        return false;
+      }
+    }
+    return true;
   }
 }

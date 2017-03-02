@@ -22,6 +22,7 @@ import com.android.cyborg.CyborgTestOptions;
 import com.android.cyborg.Filter;
 import com.android.cyborg.ViewNode;
 
+import com.android.ddmlib.RawImage;
 import java.security.Key;
 import java.util.HashSet;
 import java.util.List;
@@ -32,10 +33,11 @@ public class KeyNavCheck extends CyborgTest {
   private static final Set<String> WHITELISTED_INACCESSIBLE_IDS = new HashSet<>();
   private static final CyborgTestOptions OPTIONS = new CyborgTestOptions();
   static {
-    WHITELISTED_INACCESSIBLE_IDS.add("id/back");
-    WHITELISTED_INACCESSIBLE_IDS.add("id/home");
+    WHITELISTED_INACCESSIBLE_IDS.add("id/back");  // Main back button
+    WHITELISTED_INACCESSIBLE_IDS.add("id/g_icon");  // Pixel launcher
+    WHITELISTED_INACCESSIBLE_IDS.add("id/home");  // Main home button
     WHITELISTED_INACCESSIBLE_IDS.add("id/now_header_doodle_view");
-    WHITELISTED_INACCESSIBLE_IDS.add("id/recent_apps");
+    WHITELISTED_INACCESSIBLE_IDS.add("id/recent_apps");  // Main recents button
 
     OPTIONS.printStackTrace = false;
   }
@@ -113,15 +115,13 @@ public class KeyNavCheck extends CyborgTest {
   }
 
   private void cycle() {
-    pressKeyWithCode(61, 50);
+    pressKeyWithCode(61, 10);
   }
 
   public void testCycleLengthAtTopLevel() {
     ViewNode initiallyFocusedNode = getFocusedNode();
     Set<String> visitedNodeIds = new HashSet<>();
     while (initiallyFocusedNode == null) {
-      System.err.println("Tabbing until we get a focused element...");
-      List<ViewNode> allNodes = cyborg.getNodesForObjectsWithFilter(Filter.empty());
       cycle();
       initiallyFocusedNode = getFocusedNode();
     }
@@ -145,14 +145,20 @@ public class KeyNavCheck extends CyborgTest {
         numberOfNodesInTopLevelCycle <= MAX_NUMBER_OF_CYCLABLE_ELEMENTS_AT_TOP_LEVEL);
   }
 
-  public void testAllClickableElementsCanBeAccessed() {
+  public void testScreenshotIsSelfConsistent() {
+    RawImage a = cyborg.getScreenshot();
+    cyborg.wait(1000);
+    RawImage b = cyborg.getScreenshot();
+    assertTrue(Util.rawImagesAreEqual(a, b));
+  }
+
+  public void disabledTestAllClickableElementsCanBeAccessed() {
     boolean testPassed = true;
 
     Set<String> visitedNodeIds = new HashSet<>();
     Set<ViewNode> visitedNodes = new HashSet<>();
     ViewNode initiallyFocusedNode = getFocusedNode();
     while (initiallyFocusedNode == null) {
-      System.err.println("Tabbing until we get a focused element...");
       cycle();
       initiallyFocusedNode = getFocusedNode();
     }
@@ -164,7 +170,6 @@ public class KeyNavCheck extends CyborgTest {
         this.cyborg.getNodesForObjectsWithFilter(Filter.clickable());
 
     // Exploration.
-    System.err.print("\nScanning screen");
     while(true) {
       System.err.print(".");
       cycle();
