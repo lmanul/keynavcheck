@@ -34,6 +34,7 @@ public class KeyNavCheck extends CyborgTest {
   static {
     WHITELISTED_INACCESSIBLE_IDS.add("id/back");
     WHITELISTED_INACCESSIBLE_IDS.add("id/home");
+    WHITELISTED_INACCESSIBLE_IDS.add("id/now_header_doodle_view");
     WHITELISTED_INACCESSIBLE_IDS.add("id/recent_apps");
 
     OPTIONS.printStackTrace = false;
@@ -144,7 +145,7 @@ public class KeyNavCheck extends CyborgTest {
         numberOfNodesInTopLevelCycle <= MAX_NUMBER_OF_CYCLABLE_ELEMENTS_AT_TOP_LEVEL);
   }
 
-  public void disabledTestAllClickableElementsCanBeAccessed() {
+  public void testAllClickableElementsCanBeAccessed() {
     boolean testPassed = true;
 
     Set<String> visitedNodeIds = new HashSet<>();
