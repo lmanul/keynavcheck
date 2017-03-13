@@ -6,3 +6,4 @@ build/classes
 build/libs/keynavcheck.jar
 build/tmp
 classes
+local.properties
