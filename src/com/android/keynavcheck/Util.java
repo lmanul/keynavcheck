@@ -44,7 +44,9 @@ public class Util {
     if (a.data.length != b.data.length) {
       return false;
     }
-    for (int i = 0; i < a.data.length; i++) {
+    int l = a.data.length;
+    // Stop at the last pixel (with three channels) to prevent index overflow errors.
+    for (int i = 0; i < l - 3; i++) {
       if (a.getARGB(i) != b.getARGB(i)) {
         return false;
       }
