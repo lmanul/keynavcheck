@@ -20,6 +20,10 @@ import com.android.cyborg.Cyborg;
 import com.android.cyborg.Rect;
 import com.android.cyborg.ViewNode;
 import com.android.ddmlib.RawImage;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import javax.imageio.ImageIO;
 
 public class Util {
 
@@ -41,16 +45,48 @@ public class Util {
   }
 
   public static boolean rawImagesAreEqual(RawImage a, RawImage b) {
+    return rawImagesAreEqual(a, b, false /* debug */);
+  }
+
+  public static boolean rawImagesAreEqual(RawImage a, RawImage b, boolean debug) {
     if (a.data.length != b.data.length) {
       return false;
     }
-    int l = a.data.length;
+    if (debug) {
+      BufferedImage imageA = rawImageToBufferedImage(a);
+      BufferedImage imageB = rawImageToBufferedImage(b);
+      long nowMs = System.currentTimeMillis();
+      File aOut = new File(nowMs + "a" + ".png");
+      File bOut = new File(nowMs + "b.png");
+      try {
+        ImageIO.write(imageA, "png", aOut);
+        ImageIO.write(imageB, "png", bOut);
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    }
     // Stop at the last pixel (with three channels) to prevent index overflow errors.
-    for (int i = 0; i < l - 3; i++) {
+    for (int i = 0; i < a.data.length - 3; i += 3) {
       if (a.getARGB(i) != b.getARGB(i)) {
         return false;
       }
     }
     return true;
+  }
+
+  private static BufferedImage rawImageToBufferedImage(RawImage raw) {
+    BufferedImage image = new BufferedImage(
+        raw.width, raw.height, BufferedImage.TYPE_INT_ARGB);
+
+    int i = 0;
+    int IndexInc = raw.bpp >> 3;
+    for (int y = 0 ; y < raw.height ; y++) {
+      for (int x = 0 ; x < raw.width ; x++) {
+        int value = raw.getARGB(i);
+        i += IndexInc;
+        image.setRGB(x, y, value);
+      }
+    }
+    return image;
   }
 }

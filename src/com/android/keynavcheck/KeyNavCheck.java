@@ -147,9 +147,10 @@ public class KeyNavCheck extends CyborgTest {
 
   public void testScreenshotIsSelfConsistent() {
     RawImage a = cyborg.getScreenshot();
-    cyborg.wait(1000);
+    cyborg.wait(200);
     RawImage b = cyborg.getScreenshot();
-    assertTrue(Util.rawImagesAreEqual(a, b));
+    assertTrue("Two screenshots taken within a short interval are not identical. Are you using "
+        + "a live wallpaper?", Util.rawImagesAreEqual(a, b));
   }
 
   public void disabledTestAllClickableElementsCanBeAccessed() {
