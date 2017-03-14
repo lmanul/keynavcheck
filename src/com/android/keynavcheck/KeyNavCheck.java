@@ -141,6 +141,8 @@ public class KeyNavCheck extends CyborgTest {
   }
 
   public void testScreenshotIsSelfConsistent() throws Exception {
+    // Wait for the UI to stabilize first.
+    cyborg.onAfterUserInteraction(1000);
     RawImage a = cyborg.getScreenshot();
     cyborg.wait(200);
     RawImage b = cyborg.getScreenshot();
