@@ -62,7 +62,7 @@ public class KeyNavCheck extends CyborgTest {
 
   @Override
   public void setUp() {
-    System.err.println("\n\n###################################################################\n");
+    System.err.println("\n###################################################################\n");
     launchActivityUnderTest();
   }
 
@@ -74,8 +74,6 @@ public class KeyNavCheck extends CyborgTest {
   private ViewNode getFocusedNode() {
     List<ViewNode> focusedNodes = this.cyborg.getNodesForObjectsWithFilter(Filter.isFocused());
     if (focusedNodes.size() != 1) {
-      System.err.println("\n\nExpecting one focused element, but got " +
-          focusedNodes.size() + ", something wrong?");
       return null;
     }
     return focusedNodes.get(0);
@@ -118,13 +116,10 @@ public class KeyNavCheck extends CyborgTest {
     pressKeyWithCode(61, 10);
   }
 
-  public void testCycleLengthAtTopLevel() {
-    ViewNode initiallyFocusedNode = getFocusedNode();
+  public void testCycleLengthAtTopLevel() throws Exception {
+    moveToFirstFocusableNode();
     Set<String> visitedNodeIds = new HashSet<>();
-    while (initiallyFocusedNode == null) {
-      cycle();
-      initiallyFocusedNode = getFocusedNode();
-    }
+    ViewNode initiallyFocusedNode = getFocusedNode();
     String initiallyFocusedElementId = Util.getUniqueId(initiallyFocusedNode);
     visitedNodeIds.add(initiallyFocusedElementId);
 
@@ -145,7 +140,7 @@ public class KeyNavCheck extends CyborgTest {
         numberOfNodesInTopLevelCycle <= MAX_NUMBER_OF_CYCLABLE_ELEMENTS_AT_TOP_LEVEL);
   }
 
-  public void testScreenshotIsSelfConsistent() {
+  public void testScreenshotIsSelfConsistent() throws Exception {
     RawImage a = cyborg.getScreenshot();
     cyborg.wait(200);
     RawImage b = cyborg.getScreenshot();
@@ -153,16 +148,39 @@ public class KeyNavCheck extends CyborgTest {
         + "a live wallpaper?", Util.rawImagesAreEqual(a, b));
   }
 
-  public void disabledTestAllClickableElementsCanBeAccessed() {
+  public void testFocusVisualIndicator() throws Exception {
+    moveToFirstFocusableNode();
+    Set<String> visitedNodeIds = new HashSet<>();
+    ViewNode initiallyFocusedNode = getFocusedNode();
+    String initiallyFocusedElementId = Util.getUniqueId(initiallyFocusedNode);
+    visitedNodeIds.add(initiallyFocusedElementId);
+
+    int visited = 1;
+    RawImage previousScreen = null, currentScreen = null;
+    while (visited < MAX_EXPLORATION_CYCLE_LENGTH) {
+      cycle();
+      visited++;
+      ViewNode focusedNode = getFocusedNode();
+      String focusedNodeId = Util.getUniqueId(focusedNode);
+      if (visitedNodeIds.contains(focusedNodeId)) {
+        // We're back at a visited node.
+        break;
+      }
+      currentScreen = cyborg.getScreenshot();
+      if (previousScreen != null) {
+        assertFalse(Util.rawImagesAreEqual(previousScreen, currentScreen));
+      }
+      previousScreen = currentScreen;
+    }
+  }
+
+  public void testAllClickableElementsCanBeAccessed() throws Exception {
     boolean testPassed = true;
 
+    moveToFirstFocusableNode();
     Set<String> visitedNodeIds = new HashSet<>();
     Set<ViewNode> visitedNodes = new HashSet<>();
     ViewNode initiallyFocusedNode = getFocusedNode();
-    while (initiallyFocusedNode == null) {
-      cycle();
-      initiallyFocusedNode = getFocusedNode();
-    }
     String initiallyFocusedElementId = Util.getUniqueId(initiallyFocusedNode);
     visitedNodeIds.add(initiallyFocusedElementId);
 
@@ -172,7 +190,6 @@ public class KeyNavCheck extends CyborgTest {
 
     // Exploration.
     while(true) {
-      System.err.print(".");
       cycle();
       ViewNode focusedNode = getFocusedNode();
       if (focusedNode == null) {
@@ -213,6 +230,14 @@ public class KeyNavCheck extends CyborgTest {
 
     if (!testPassed) {
       fail("\n\nSome issues were found.");
+    }
+  }
+
+  private void moveToFirstFocusableNode() {
+    ViewNode initiallyFocusedNode = getFocusedNode();
+    while (initiallyFocusedNode == null) {
+      cycle();
+      initiallyFocusedNode = getFocusedNode();
     }
   }
 
