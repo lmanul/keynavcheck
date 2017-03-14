@@ -24,6 +24,7 @@ import com.android.cyborg.ViewNode;
 
 import com.android.ddmlib.RawImage;
 import java.security.Key;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -221,13 +222,19 @@ public class KeyNavCheck extends CyborgTest {
       }
     }
 
+    // TODO: Save an image with inaccessible nodes outlined in red.
+    List<ViewNode> inaccessibleNodes = new ArrayList<>();
     for (ViewNode node : clickableNodes) {
       String nodeId = Util.getUniqueId(node);
       if (!visitedNodeIds.contains(nodeId) && !WHITELISTED_INACCESSIBLE_IDS.contains(node.id)) {
         testPassed = false;
-        System.err.println("\n\n!!! This element is clickable but not accessible via keyboard:");
-        printIdentifiableNodeInfo(node);
+        inaccessibleNodes.add(node);
       }
+    }
+
+    for (ViewNode n : inaccessibleNodes) {
+      System.err.println("\n\n!!! This element is clickable but not accessible via keyboard:");
+      printIdentifiableNodeInfo(n);
     }
 
     if (!testPassed) {
