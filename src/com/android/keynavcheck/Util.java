@@ -65,7 +65,18 @@ public class Util {
     return true;
   }
 
-  private static void saveImageOnDisk(RawImage img, String fileNameSuffix) {
+  public static void printIdentifiableNodeInfo(ViewNode node) {
+    System.err.println("* ID: " + node.id);
+    System.err.println("* Position on screen: " + Cyborg.getRectForNode(node));
+    if (node.namedProperties.containsKey("text:text")) {
+      System.err.println("* Text: " + node.namedProperties.get("text:text").value);
+    }
+    if (node.namedProperties.containsKey("accessibility:contentDescription")) {
+      System.err.println("* Content desc: " + node.namedProperties.get("accessibility:contentDescription").value);
+    }
+  }
+
+  public static void saveImageOnDisk(RawImage img, String fileNameSuffix) {
     new Thread(() -> {
       BufferedImage buffered = rawImageToBufferedImage(img);
       long nowMs = System.currentTimeMillis();

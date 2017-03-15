@@ -16,19 +16,18 @@
 
 package com.android.keynavcheck;
 
-import com.android.cyborg.Cyborg;
 import com.android.cyborg.CyborgTest;
 import com.android.cyborg.CyborgTestOptions;
 import com.android.cyborg.Filter;
 import com.android.cyborg.ViewNode;
 
 import com.android.ddmlib.RawImage;
-import java.security.Key;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+@SuppressWarnings("unused")
 public class KeyNavCheck extends CyborgTest {
 
   private static final boolean DEBUG = false;
@@ -51,7 +50,7 @@ public class KeyNavCheck extends CyborgTest {
   private final String pkg;
   private final String activity;
 
-  public KeyNavCheck(String pkg, String activity) {
+  private KeyNavCheck(String pkg, String activity) {
     super(OPTIONS);
     this.pkg = pkg;
     this.activity = activity;
@@ -96,17 +95,6 @@ public class KeyNavCheck extends CyborgTest {
       // cyborg.runShellCommand("am force-stop " + this.pkg);
       cyborg.pressHome();
       cyborg.onAfterUserInteraction(2000);
-    }
-  }
-
-  private void printIdentifiableNodeInfo(ViewNode node) {
-    System.err.println("* ID: " + node.id);
-    System.err.println("* Position on screen: " + Cyborg.getRectForNode(node));
-    if (node.namedProperties.containsKey("text:text")) {
-      System.err.println("* Text: " + node.namedProperties.get("text:text").value);
-    }
-    if (node.namedProperties.containsKey("accessibility:contentDescription")) {
-      System.err.println("* Content desc: " + node.namedProperties.get("accessibility:contentDescription").value);
     }
   }
 
@@ -161,7 +149,7 @@ public class KeyNavCheck extends CyborgTest {
     visitedNodeIds.add(initiallyFocusedElementId);
 
     int visited = 1;
-    RawImage previousScreen = null, currentScreen = null;
+    RawImage previousScreen = null, currentScreen;
     while (visited < MAX_EXPLORATION_CYCLE_LENGTH) {
       cycle();
       visited++;
@@ -220,7 +208,7 @@ public class KeyNavCheck extends CyborgTest {
         testPassed = false;
         System.err.println(
             "\n\n!!! This element can be focused with the keyboard but isn't clickable:");
-        printIdentifiableNodeInfo(node);
+        Util.printIdentifiableNodeInfo(node);
       }
     }
 
@@ -236,7 +224,7 @@ public class KeyNavCheck extends CyborgTest {
 
     for (ViewNode n : inaccessibleNodes) {
       System.err.println("\n\n!!! This element is clickable but not accessible via keyboard:");
-      printIdentifiableNodeInfo(n);
+      Util.printIdentifiableNodeInfo(n);
     }
 
     if (!testPassed) {
