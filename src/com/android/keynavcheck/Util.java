@@ -109,4 +109,13 @@ public class Util {
     }
     return image;
   }
+
+  public static void paintRectOnImage(Rect r, int color, BufferedImage img) {
+    System.err.println("Painting " + r + " onto " + img);
+    // Top border
+    int i = 0;
+    for (int x = r.x; x < r.x + r.w; x++) {
+      img.setRGB(x, r.y, color);
+    }
+  }
 }

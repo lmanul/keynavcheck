@@ -16,12 +16,15 @@
 
 package com.android.keynavcheck;
 
+import com.android.cyborg.Cyborg;
 import com.android.cyborg.CyborgTest;
 import com.android.cyborg.CyborgTestOptions;
 import com.android.cyborg.Filter;
+import com.android.cyborg.Rect;
 import com.android.cyborg.ViewNode;
 
 import com.android.ddmlib.RawImage;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -226,8 +229,18 @@ public class KeyNavCheck extends CyborgTest {
       Util.printIdentifiableNodeInfo(n);
     }
 
-    assertTrue("Some issues were found.",
-        nonClickableNodes.isEmpty() && inaccessibleNodes.isEmpty());
+    boolean passed = nonClickableNodes.isEmpty() && inaccessibleNodes.isEmpty();
+    if (!passed) {
+      // Let's save a screenshot with indications on what to fix.
+      BufferedImage img = Util.rawImageToBufferedImage(cyborg.getScreenshot());
+      for (ViewNode n : inaccessibleNodes) {
+        Rect r = Cyborg.getRectForNode(n);
+        Util.paintRectOnImage(r, 0xff0000, img);
+      }
+      Util.saveImageOnDisk(img, "inaccessible_elements");
+    }
+
+    assertTrue("Some issues were found.", passed);
   }
 
   private void moveToFirstFocusableNode() {
