@@ -77,8 +77,12 @@ public class Util {
   }
 
   public static void saveImageOnDisk(RawImage img, String fileNameSuffix) {
+    BufferedImage buffered = rawImageToBufferedImage(img);
+    saveImageOnDisk(buffered, fileNameSuffix);
+  }
+
+  public static void saveImageOnDisk(BufferedImage buffered, String fileNameSuffix) {
     new Thread(() -> {
-      BufferedImage buffered = rawImageToBufferedImage(img);
       long nowMs = System.currentTimeMillis();
       File out = new File(nowMs + fileNameSuffix + ".png");
       try {
@@ -90,16 +94,16 @@ public class Util {
 
   }
 
-  private static BufferedImage rawImageToBufferedImage(RawImage raw) {
+  public static BufferedImage rawImageToBufferedImage(RawImage raw) {
     BufferedImage image = new BufferedImage(
         raw.width, raw.height, BufferedImage.TYPE_INT_ARGB);
 
     int i = 0;
-    int IndexInc = raw.bpp >> 3;
+    int increment = raw.bpp >> 3;
     for (int y = 0 ; y < raw.height ; y++) {
       for (int x = 0 ; x < raw.width ; x++) {
         int value = raw.getARGB(i);
-        i += IndexInc;
+        i += increment;
         image.setRGB(x, y, value);
       }
     }
