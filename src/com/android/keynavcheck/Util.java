@@ -53,17 +53,8 @@ public class Util {
       return false;
     }
     if (debug) {
-      BufferedImage imageA = rawImageToBufferedImage(a);
-      BufferedImage imageB = rawImageToBufferedImage(b);
-      long nowMs = System.currentTimeMillis();
-      File aOut = new File(nowMs + "a" + ".png");
-      File bOut = new File(nowMs + "b.png");
-      try {
-        ImageIO.write(imageA, "png", aOut);
-        ImageIO.write(imageB, "png", bOut);
-      } catch (IOException e) {
-        e.printStackTrace();
-      }
+      saveImageOnDisk(a, "a");
+      saveImageOnDisk(b, "b");
     }
     // Stop at the last pixel (with three channels) to prevent index overflow errors.
     for (int i = 0; i < a.data.length - 3; i += 3) {
@@ -72,6 +63,20 @@ public class Util {
       }
     }
     return true;
+  }
+
+  private static void saveImageOnDisk(RawImage img, String fileNameSuffix) {
+    new Thread(() -> {
+      BufferedImage buffered = rawImageToBufferedImage(img);
+      long nowMs = System.currentTimeMillis();
+      File out = new File(nowMs + fileNameSuffix + ".png");
+      try {
+        ImageIO.write(buffered, "png", out);
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    }).start();
+
   }
 
   private static BufferedImage rawImageToBufferedImage(RawImage raw) {
