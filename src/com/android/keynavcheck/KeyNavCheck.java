@@ -31,6 +31,8 @@ import java.util.Set;
 
 public class KeyNavCheck extends CyborgTest {
 
+  private static final boolean DEBUG = false;
+
   private static final Set<String> WHITELISTED_INACCESSIBLE_IDS = new HashSet<>();
   private static final CyborgTestOptions OPTIONS = new CyborgTestOptions();
   static {
@@ -148,7 +150,7 @@ public class KeyNavCheck extends CyborgTest {
     cyborg.wait(200);
     RawImage b = cyborg.getScreenshot();
     assertTrue("Two screenshots taken within a short interval are not identical. Are you using "
-        + "a live wallpaper?", Util.rawImagesAreEqual(a, b));
+        + "a live wallpaper?", Util.rawImagesAreEqual(a, b, DEBUG));
   }
 
   public void testFocusVisualIndicator() throws Exception {
@@ -171,7 +173,7 @@ public class KeyNavCheck extends CyborgTest {
       }
       currentScreen = cyborg.getScreenshot();
       if (previousScreen != null) {
-        assertFalse(Util.rawImagesAreEqual(previousScreen, currentScreen));
+        assertFalse(Util.rawImagesAreEqual(previousScreen, currentScreen, DEBUG));
       }
       previousScreen = currentScreen;
     }
