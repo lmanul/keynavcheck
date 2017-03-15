@@ -167,9 +167,7 @@ public class KeyNavCheck extends CyborgTest {
     }
   }
 
-  public void testAllClickableElementsCanBeAccessed() throws Exception {
-    boolean testPassed = true;
-
+  public void solotestAllClickableElementsCanBeAccessed() throws Exception {
     moveToFirstFocusableNode();
     Set<String> visitedNodeIds = new HashSet<>();
     Set<ViewNode> visitedNodes = new HashSet<>();
@@ -203,12 +201,10 @@ public class KeyNavCheck extends CyborgTest {
 
     // Analysis.
     System.err.println("\nCycled through " + visitedNodes.size() + " elements.");
+    List<ViewNode> nonClickableNodes = new ArrayList<>();
     for (ViewNode node : visitedNodes) {
       if (!clickable(node)) {
-        testPassed = false;
-        System.err.println(
-            "\n\n!!! This element can be focused with the keyboard but isn't clickable:");
-        Util.printIdentifiableNodeInfo(node);
+        nonClickableNodes.add(node);
       }
     }
 
@@ -217,19 +213,21 @@ public class KeyNavCheck extends CyborgTest {
     for (ViewNode node : clickableNodes) {
       String nodeId = Util.getUniqueId(node);
       if (!visitedNodeIds.contains(nodeId) && !WHITELISTED_INACCESSIBLE_IDS.contains(node.id)) {
-        testPassed = false;
         inaccessibleNodes.add(node);
       }
     }
 
+    for (ViewNode n : nonClickableNodes) {
+      System.err.println("\n\nElement can be focused with the keyboard but isn't clickable:");
+      Util.printIdentifiableNodeInfo(n);
+    }
     for (ViewNode n : inaccessibleNodes) {
-      System.err.println("\n\n!!! This element is clickable but not accessible via keyboard:");
+      System.err.println("\n\nElement is clickable but not accessible via keyboard:");
       Util.printIdentifiableNodeInfo(n);
     }
 
-    if (!testPassed) {
-      fail("\n\nSome issues were found.");
-    }
+    assertTrue("Some issues were found.",
+        nonClickableNodes.isEmpty() && inaccessibleNodes.isEmpty());
   }
 
   private void moveToFirstFocusableNode() {
