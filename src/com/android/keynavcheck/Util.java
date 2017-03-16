@@ -111,12 +111,12 @@ public class Util {
   }
 
   public static void paintVisibleOutlineOnImage(Rect r, int color, BufferedImage img) {
-    int thickness = 5;
+    int thickness = 4;
     // TODO: Find contrasting color instead of just white.
     int contrastingColor = 0xffffffff;
     r.shrink(1);
     paintRectOnImage(r, contrastingColor, img);
-    r.grow(2);
+    r.grow(1);
     for (int i = 0; i < thickness; i++) {
       paintRectOnImage(r, color, img);
       r.grow(1);
