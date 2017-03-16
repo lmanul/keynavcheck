@@ -84,14 +84,14 @@ public class Util {
   public static void saveImageOnDisk(BufferedImage buffered, String fileNameSuffix) {
     new Thread(() -> {
       long nowMs = System.currentTimeMillis();
-      File out = new File(nowMs + fileNameSuffix + ".png");
+      String fileName = nowMs + fileNameSuffix + ".png";
+      File out = new File(fileName);
       try {
         ImageIO.write(buffered, "png", out);
       } catch (IOException e) {
         e.printStackTrace();
       }
     }).start();
-
   }
 
   public static BufferedImage rawImageToBufferedImage(RawImage raw) {
@@ -110,12 +110,43 @@ public class Util {
     return image;
   }
 
-  public static void paintRectOnImage(Rect r, int color, BufferedImage img) {
-    System.err.println("Painting " + r + " onto " + img);
-    // Top border
-    int i = 0;
-    for (int x = r.x; x < r.x + r.w; x++) {
-      img.setRGB(x, r.y, color);
+  public static void paintVisibleOutlineOnImage(Rect r, int color, BufferedImage img) {
+    int thickness = 5;
+    // TODO: Find contrasting color instead of just white.
+    int contrastingColor = 0xffffffff;
+    r.shrink(1);
+    paintRectOnImage(r, contrastingColor, img);
+    r.grow(2);
+    for (int i = 0; i < thickness; i++) {
+      paintRectOnImage(r, color, img);
+      r.grow(1);
     }
+    paintRectOnImage(r, contrastingColor, img);
+  }
+
+  public static void paintRectOnImage(Rect r, int color, BufferedImage img) {
+    // Top and bottom border
+    for (int x = r.x; x < r.x + r.w; x++) {
+      if (pointIsWithinImageBounds(x, r.y, img)) {
+        img.setRGB(x, r.y, color);
+      }
+      if (pointIsWithinImageBounds(x, r.y + r.h, img)) {
+        img.setRGB(x, r.y + r.h, color);
+      }
+    }
+
+    // Left and right border
+    for (int y = r.y; y < r.y + r.h; y++) {
+      if (pointIsWithinImageBounds(r.x, y, img)) {
+        img.setRGB(r.x, y, color);
+      }
+      if (pointIsWithinImageBounds(r.x + r.w, y, img)) {
+        img.setRGB(r.x + r.w, y, color);
+      }
+    }
+  }
+
+  private static boolean pointIsWithinImageBounds(int x, int y, BufferedImage img) {
+    return x >= 0 && x < img.getWidth() && y >= 0 && y < img.getHeight();
   }
 }

@@ -235,7 +235,11 @@ public class KeyNavCheck extends CyborgTest {
       BufferedImage img = Util.rawImageToBufferedImage(cyborg.getScreenshot());
       for (ViewNode n : inaccessibleNodes) {
         Rect r = Cyborg.getRectForNode(n);
-        Util.paintRectOnImage(r, 0xff0000, img);
+        Util.paintVisibleOutlineOnImage(r, 0xff000000, img);
+      }
+      for (ViewNode n : nonClickableNodes) {
+        Rect r = Cyborg.getRectForNode(n);
+        Util.paintVisibleOutlineOnImage(r, 0xff000000, img);
       }
       Util.saveImageOnDisk(img, "inaccessible_elements");
     }
