@@ -179,8 +179,15 @@ public class KeyNavCheck extends CyborgTest {
     visitedNodeIds.add(initiallyFocusedElementId);
 
     // Gather clickable nodes anywhere.
+    Filter clickable = Filter.clickable();
+    if (pkg != null) {
+      clickable.pkg = pkg;
+    }
+    if (activity != null) {
+      clickable.activity = activity;
+    }
     List<ViewNode> clickableNodes =
-        this.cyborg.getNodesForObjectsWithFilter(Filter.clickable());
+        this.cyborg.getNodesForObjectsWithFilter(clickable);
 
     // Exploration.
     while(true) {
