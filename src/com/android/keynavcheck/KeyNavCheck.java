@@ -249,6 +249,8 @@ public class KeyNavCheck extends CyborgTest {
         Util.paintVisibleOutlineOnImage(r, 0xff0000ff, img);
       }
       Util.saveImageOnDisk(img, "inaccessible_elements");
+      // TODO: Find an elegant way to give this time to finish in the case where no activity and
+      // package is passed in the command line.
     }
 
     assertTrue("Some issues were found.", passed);
